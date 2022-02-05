@@ -1,7 +1,7 @@
 
 class Timer extends React.Component {
     render() {
-      const { title, project } = this.props;
+      const { title, project, elapsed } = this.props;
       return (
         <div className='ui centered card'>
           <div className='content'>
@@ -13,7 +13,7 @@ class Timer extends React.Component {
             </div>
             <div className='center aligned description'>
               <h2>
-                12:20
+                {helpers.renderElapsedString(elapsed)}
               </h2>
             </div>
             <div className='extra content'>
