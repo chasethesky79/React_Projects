@@ -92,8 +92,13 @@ class TimersDashboard extends React.Component {
     }
 }
 class TimerForm extends React.Component {
+    state = {
+        title: this.props.title || '',
+        project: this.props.project || ''
+    }
     render() {
-        const { title, project, onClickCancel } = this.props;
+        const { onClickCancel } = this.props;
+        const { title, project } = this.state;
         const submitText = title ? 'Update': 'Create';
         return (
             <div className='ui centered card'>
@@ -101,14 +106,14 @@ class TimerForm extends React.Component {
                     <div className='ui form'>
                         <div className='field'>
                             <label>Title</label>
-                            <input type='text' defaultValue={title}/>
+                            <input type='text' value ={title} onChange={event => this.setState({ title: event.target.value })}/>
                         </div>
                         <div className='field'>
                             <label>Project</label>
-                            <input type='text' defaultValue={project}/>
+                            <input type='text' value ={project} onChange={event => this.setState({ project: event.target.value })}/>
                         </div>
                         <div className='ui two bottom attached buttons'>
-                            <button className='ui basic blue button'>
+                            <button className='ui basic blue button' onClick={() => console.log(`STATE ${JSON.stringify(this.state)}`)}>
                                 {submitText}
                             </button>
                             <button className='ui basic blue button' onClick={onClickCancel}>
