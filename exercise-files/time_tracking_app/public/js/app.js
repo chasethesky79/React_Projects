@@ -1,6 +1,10 @@
 class EditableTimer extends React.Component {
+    state = {
+        editFormOpen: false
+    }
     render() {
-     const { title, project, elapsed, runningSince, editFormOpen } = this.props;
+     const { title, project, elapsed, runningSince, id } = this.props;
+     const { editFormOpen } = this.state;
      return (
          <div>
             {editFormOpen
@@ -8,6 +12,7 @@ class EditableTimer extends React.Component {
                     title={title}
                     project={project}/>
                 : <Timer
+                    id={id}
                     title={title}
                     project={project}
                     runningSince={runningSince}
@@ -19,20 +24,17 @@ class EditableTimer extends React.Component {
 }
 class EditableTimerList extends React.Component {
     render() {
+        const { timers } = this.props;
         return (
           <div>
+            {timers && timers.map(({ title, project, elapsed, runningSince, id }) => 
             <EditableTimer
-              title='Learn React'
-              project='Web Domination'
-              elapsed='8986300'
-              runningSince={null}
-              editFormOpen={false}/>
-            <EditableTimer
-              title='Learn extreme Ironing'
-              project='Web Domination'
-              elapsed='3890985'
-              runningSince={null}
-              editFormOpen={true}/>
+              key={id}
+              title={title}
+              project={project}
+              elapsed={elapsed}
+              runningSince={runningSince}/>
+            )}
           </div>
         )
     }
@@ -51,12 +53,31 @@ class ToggleableTimerForm extends React.Component {
     }
 }
 class TimersDashboard extends React.Component {
+    state = {
+        timers: [
+            {
+                title: 'Practise Squat',
+                project: 'Gym Chores',
+                id: uuid.v4(),
+                elapsed: 5456099,
+                runningSince: Date.now()
+            },
+            {
+                title: 'Bake Squash',
+                project: 'Kitchen Chores',
+                id: uuid.v4(),
+                elapsed: 1273998,
+                runningSince: null
+            }
+        ]
+    }
     render() {
+        const { timers } = this.state;
         return (
             <div className='ui three column centered grid'>
                 <div className='column'>
-                    <EditableTimerList/>
-                    <ToggleableTimerForm isOpen={false}/>
+                    <EditableTimerList timers={timers}/>
+                    <ToggleableTimerForm isOpen={true}/>
                 </div>
             </div>
         )
@@ -94,7 +115,7 @@ class TimerForm extends React.Component {
 }
 class Timer extends React.Component {
     render() {
-      const { title, project, elapsed } = this.props;
+      const { title, project, elapsed, id } = this.props;
       return (
         <div className='ui centered card'>
           <div className='content'>
