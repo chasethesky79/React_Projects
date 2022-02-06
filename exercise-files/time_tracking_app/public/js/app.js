@@ -3,17 +3,23 @@ class EditableTimer extends React.Component {
         editFormOpen: false
     }
     render() {
-     const { title, project, elapsed, runningSince, id } = this.props;
+     const { title, project, elapsed, runningSince, id, onFormSubmit } = this.props;
      const { editFormOpen } = this.state;
      const handleOnClickCancel = () => this.setState({ editFormOpen: false })
      const handleOnClickEdit = () => this.setState({ editFormOpen: true })
+     const handleTimerSubmit = (id, timerState) => {
+         onFormSubmit(id, timerState);
+         this.setState({ editFormOpen: false });
+     }
      return (
          <div>
             {editFormOpen
-                ? <TimerForm 
+                ? <TimerForm
+                    id={id} 
                     title={title}
                     project={project}
-                    onClickCancel={handleOnClickCancel}/>
+                    onClickCancel={handleOnClickCancel}
+                    onFormSubmit={handleTimerSubmit}/>
                 : <Timer
                     id={id}
                     title={title}
@@ -28,16 +34,18 @@ class EditableTimer extends React.Component {
 }
 class EditableTimerList extends React.Component {
     render() {
-        const { timers } = this.props;
+        const { timers, onFormSubmit } = this.props;
         return (
           <div>
             {timers && timers.map(({ title, project, elapsed, runningSince, id }) => 
             <EditableTimer
               key={id}
+              id={id}
               title={title}
               project={project}
               elapsed={elapsed}
-              runningSince={runningSince}/>
+              runningSince={runningSince}
+              onFormSubmit={onFormSubmit}/>
             )}
           </div>
         )
@@ -49,11 +57,12 @@ class ToggleableTimerForm extends React.Component {
     }
     render() {
         const { isOpen } = this.state;
+        const { onFormSubmit } = this.props;
         const handleOnClickCancel = () => this.setState({ isOpen: false })
         return (
             <div>
                {isOpen
-                   ? <TimerForm onClickCancel={handleOnClickCancel}/>
+                   ? <TimerForm onClickCancel={handleOnClickCancel} onFormSubmit={onFormSubmit}/>
                    : <div className='ui basic content center aligned segment'><button className='ui basic button icon' onClick={() => this.setState({ isOpen: true })}><i className='plus icon'/></button></div>
                }
            </div>
@@ -81,11 +90,20 @@ class TimersDashboard extends React.Component {
     }
     render() {
         const { timers } = this.state;
+        const onFormSubmit = (id, timerState) => {
+            const { title, project } = timerState;
+            if (id) {
+              this.setState({ timers: timers.map(timer => timer.id === id ? Object.assign({}, timer, { title, project }) : timer)})
+            } else {
+              const newTimer = helpers.newTimer(timerState);
+              this.setState({ timers: timers.concat(newTimer)});
+            }
+        }
         return (
             <div className='ui three column centered grid'>
                 <div className='column'>
-                    <EditableTimerList timers={timers}/>
-                    <ToggleableTimerForm/>
+                    <EditableTimerList timers={timers} onFormSubmit={onFormSubmit}/>
+                    <ToggleableTimerForm onFormSubmit={onFormSubmit}/>
                 </div>
             </div>
         )
@@ -97,9 +115,9 @@ class TimerForm extends React.Component {
         project: this.props.project || ''
     }
     render() {
-        const { onClickCancel } = this.props;
+        const { id, onClickCancel, onFormSubmit } = this.props;
         const { title, project } = this.state;
-        const submitText = title ? 'Update': 'Create';
+        const submitText = id ? 'Update': 'Create';
         return (
             <div className='ui centered card'>
                 <div className='content'>
@@ -113,7 +131,7 @@ class TimerForm extends React.Component {
                             <input type='text' value ={project} onChange={event => this.setState({ project: event.target.value })}/>
                         </div>
                         <div className='ui two bottom attached buttons'>
-                            <button className='ui basic blue button' onClick={() => console.log(`STATE ${JSON.stringify(this.state)}`)}>
+                            <button className='ui basic blue button' onClick={() => onFormSubmit(id, this.state)}>
                                 {submitText}
                             </button>
                             <button className='ui basic blue button' onClick={onClickCancel}>
