@@ -5,18 +5,22 @@ class EditableTimer extends React.Component {
     render() {
      const { title, project, elapsed, runningSince, id } = this.props;
      const { editFormOpen } = this.state;
+     const handleOnClickCancel = () => this.setState({ editFormOpen: false })
+     const handleOnClickEdit = () => this.setState({ editFormOpen: true })
      return (
          <div>
             {editFormOpen
                 ? <TimerForm 
                     title={title}
-                    project={project}/>
+                    project={project}
+                    onClickCancel={handleOnClickCancel}/>
                 : <Timer
                     id={id}
                     title={title}
                     project={project}
                     runningSince={runningSince}
-                    elapsed={elapsed}/>
+                    elapsed={elapsed}
+                    onClickEdit={handleOnClickEdit}/>
             }
         </div>
      )
@@ -40,13 +44,17 @@ class EditableTimerList extends React.Component {
     }
 }
 class ToggleableTimerForm extends React.Component {
+    state = {
+        isOpen: false
+    }
     render() {
-        const { isOpen } = this.props;
+        const { isOpen } = this.state;
+        const handleOnClickCancel = () => this.setState({ isOpen: false })
         return (
             <div>
                {isOpen
-                   ? <TimerForm/>
-                   : <div className='ui basic content center aligned segment'><button className='ui basic button icon'><i className='plus icon'/></button></div>
+                   ? <TimerForm onClickCancel={handleOnClickCancel}/>
+                   : <div className='ui basic content center aligned segment'><button className='ui basic button icon' onClick={() => this.setState({ isOpen: true })}><i className='plus icon'/></button></div>
                }
            </div>
         )
@@ -77,7 +85,7 @@ class TimersDashboard extends React.Component {
             <div className='ui three column centered grid'>
                 <div className='column'>
                     <EditableTimerList timers={timers}/>
-                    <ToggleableTimerForm isOpen={true}/>
+                    <ToggleableTimerForm/>
                 </div>
             </div>
         )
@@ -85,7 +93,7 @@ class TimersDashboard extends React.Component {
 }
 class TimerForm extends React.Component {
     render() {
-        const { title, project } = this.props;
+        const { title, project, onClickCancel } = this.props;
         const submitText = title ? 'Update': 'Create';
         return (
             <div className='ui centered card'>
@@ -103,7 +111,7 @@ class TimerForm extends React.Component {
                             <button className='ui basic blue button'>
                                 {submitText}
                             </button>
-                            <button className='ui basic blue button'>
+                            <button className='ui basic blue button' onClick={onClickCancel}>
                                  Cancel
                             </button>
                         </div>
@@ -115,7 +123,7 @@ class TimerForm extends React.Component {
 }
 class Timer extends React.Component {
     render() {
-      const { title, project, elapsed, id } = this.props;
+      const { title, project, elapsed, id, onClickEdit } = this.props;
       return (
         <div className='ui centered card'>
           <div className='content'>
@@ -132,7 +140,7 @@ class Timer extends React.Component {
             </div>
             <div className='extra content'>
               <span className='right floated edit icon'>
-                <i className='edit icon' />
+                <i className='edit icon' onClick={onClickEdit}/>
               </span>
               <span className='right floated trash icon'>
                 <i className='trash icon' />
