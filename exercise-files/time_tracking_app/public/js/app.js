@@ -96,15 +96,19 @@ class TimersDashboard extends React.Component {
 
     render() {
         const { timers } = this.state;
-        const onStartTimer = timerId => this.setState({ timers: timers.map(timer => timer.id === timerId ? Object.assign({}, timer, { runningSince: Date.now(), timerIsRunning: true }) : timer) });
-        const onStopTimer = timerId => this.setState({ timers: timers.map(timer => timer.id === timerId ? Object.assign({}, timer, { elapsed: Date.now() - timer.runningSince, runningSince: null, timerIsRunning: false }) : timer) });
+        const onStartTimer = timerId => {
+          client.startTimer({ id: timerId, start: Date.now() } ).then(this.loadTimersFromServer);
+        }
+        const onStopTimer = timerId => {
+          client.stopTimer({ id: timerId, stop: Date.now() } ).then(this.loadTimersFromServer);
+        }
         const onFormSubmit = (timerState, id) => {
             const { title, project } = timerState;
             if (id) {
-              this.setState({ timers: timers.map(timer => timer.id === id ? Object.assign({}, timer, { title, project }) : timer)})
+              client.updateTimer({ id, title, project }).then(this.loadTimersFromServer); 
             } else {
               const newTimer = helpers.newTimer(timerState);
-              this.setState({ timers: timers.concat(newTimer)});
+              client.createTimer(newTimer).then(this.loadTimersFromServer);           
             }
         }
         const onDeleteTimer = id => this.setState({ timers: timers.filter(timer => timer.id !== id )});          
