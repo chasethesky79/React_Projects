@@ -83,25 +83,16 @@ class ToggleableTimerForm extends React.Component {
 }
 class TimersDashboard extends React.Component {
     state = {
-        timers: [
-            {
-                title: 'Practise Squat',
-                project: 'Gym Chores',
-                id: uuid.v4(),
-                elapsed: 5456099,
-                runningSince: null,
-                timerIsRunning: false
-            },
-            {
-                title: 'Bake Squash',
-                project: 'Kitchen Chores',
-                id: uuid.v4(),
-                elapsed: 1273998,
-                runningSince: null,
-                timerIsRunning: false
-            }
-        ]
+        timers: []
     }
+    componentDidMount() {
+      this.loadTimersFromServer();
+      setInterval(this.loadTimersFromServer, 5000);
+    }
+  loadTimersFromServer() {
+    client.getTimers((timers) => this.setState({ timers }));
+  }
+
     render() {
         const { timers } = this.state;
         const onStartTimer = timerId => this.setState({ timers: timers.map(timer => timer.id === timerId ? Object.assign({}, timer, { runningSince: Date.now(), timerIsRunning: true }) : timer) });
