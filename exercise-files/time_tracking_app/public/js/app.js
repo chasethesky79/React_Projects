@@ -89,9 +89,10 @@ class TimersDashboard extends React.Component {
       this.loadTimersFromServer();
       setInterval(this.loadTimersFromServer, 5000);
     }
-  loadTimersFromServer() {
-    client.getTimers((timers) => this.setState({ timers }));
-  }
+
+    loadTimersFromServer = () => {
+      client.getTimers((timers) => this.setState({ timers }));
+    }
 
     render() {
         const { timers } = this.state;
